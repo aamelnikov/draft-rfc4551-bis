@@ -1341,7 +1341,7 @@ to handle EXPUNGE replies.
 
       </section>
 
-      <section title="QRESYNC Parameter to SELECT/EXAMINE">
+      <section title="QRESYNC Parameter to SELECT/EXAMINE" anchor="qresync-select">
 				<t>
 				The Quick Resynchronization parameter to SELECT/EXAMINE commands
 				has four arguments:
@@ -1490,7 +1490,8 @@ to handle EXPUNGE replies.
         In the above example flag information for the UID 42 is not returned, presumably because its flags
         haven't changed since the MODSEQ 90060115194045000.
         </t>
-        
+
+<!--Make a new reference: message-seq-match-data-->
 				<t>
 				Message sequence match data:
 				</t>
@@ -1916,7 +1917,7 @@ Example:    C: . UID EXPUNGE 3000:3002
 
 			</section>
 
-            <section title="VANISHED Response" anchor="vanished-resp">
+      <section title="VANISHED Response" anchor="vanished-resp">
 				<t>
 				The VANISHED response reports that the specified UIDs have been
 				permanently removed from the mailbox. This response is similar to
@@ -1928,17 +1929,37 @@ Example:    C: . UID EXPUNGE 3000:3002
 				</t>
 
 				<t>The VANISHED response has the same restrictions on when it can
-				be sent as does the EXPUNGE response (see below).</t>
+				be sent as does the EXPUNGE response (see below).  Once a client has
+        issued "ENABLE QRESYNC" (and the server has positively responded
+        to that command with the untagged ENABLED response containing
+        QRESYNC), the server MUST use the VANISHED response without the
+        EARLIER tag instead of the EXPUNGE response for all mailboxes that
+        don't return NOMODSEQ when selected.
+				The server continues using VANISHED in lieu of EXPUNGE
+				for the duration of the connection. In particular,
+				this affects the EXPUNGE <xref target="RFC3501"/> and
+				UID EXPUNGE <xref target="UIDPLUS"/>
+				commands, as well as messages expunged in other connections.
+				Such a VANISHED response MUST NOT contain the EARLIER tag.
+        </t>
 
-				<t>
-				The VANISHED response has two forms. The first form contains
-				the EARLIER tag, which signifies that the response was caused by
-				a UID FETCH (VANISHED) or a SELECT/EXAMINE (QRESYNC) command.
-                The second form doesn't contain the EARLIER tag and is used for
-                announcing message removals within an already selected mailbox.
-				</t>
+        <t>
+        The VANISHED response has two forms. The first form contains
+        the EARLIER tag, which signifies that the response was caused by
+        a UID FETCH (VANISHED) or a SELECT/EXAMINE (QRESYNC) command.
+        The second form doesn't contain the EARLIER tag and is used for
+        announcing message removals within an already selected mailbox.
+        </t>
 
-			<section title="VANISHED (EARLIER) Response" anchor="vanished-resp-earlier">
+        <t>
+        Because clients handle the two different forms of the VANISHED response
+        differently, servers MUST NOT combine them: messages
+        are reported in VANISHED responses with or without the EARLIER
+        tag, as appropriate to the cause, and, if necessary, two
+        VANISHED responses are sent (one with EARLIER and one without).
+        </t>
+
+        <section title="VANISHED (EARLIER) Response" anchor="vanished-resp-earlier">
 				<t>
 					<list style="hanging" hangIndent="11">
 						<t hangText="Contents:">an EARLIER tag</t>
@@ -1947,24 +1968,16 @@ Example:    C: . UID EXPUNGE 3000:3002
 				</t>
 
 				<t>
-                The VANISHED (EARLIER) response is caused by
-				a UID FETCH (VANISHED) or a SELECT/EXAMINE (QRESYNC) command.
-				This response is sent if the UID set parameter to the UID FETCH
-				(VANISHED) command includes UIDs of messages that are no
-				longer in the mailbox. When the client sees a VANISHED EARLIER
-				response, it MUST NOT decrement message sequence numbers for each
-				successive message in the mailbox.
-				</t>
+        The VANISHED (EARLIER) response is caused by
+        a UID FETCH (VANISHED) or a SELECT/EXAMINE (QRESYNC) command.
+        This response is sent if the UID set parameter to the UID FETCH
+        (VANISHED) command includes UIDs of messages that are no
+        longer in the mailbox. When the client sees a VANISHED EARLIER
+        response, it MUST NOT decrement message sequence numbers for each
+        successive message in the mailbox.
+        </t>
 
-				<t>
-				Because clients handle the VANISHED (EARLIER) and VANISHED responses
-				differently, servers MUST NOT report UIDs resulting from a
-				UID FETCH (VANISHED) or a SELECT/EXAMINE (QRESYNC) in the same VANISHED
-				response as UIDs of messages expunged now (i.e., messages expunged in
-                other connections). Instead, the server MUST send two separate responses:
-                one VANISHED (EARLIER) and one VANISHED without the EARLIER tag.
-				</t>
-            </section>
+      </section>
 
 			<section title="VANISHED Response without the (EARLIER) Tag" anchor="vanished-resp-noearlier">
 				<t>
@@ -1973,7 +1986,7 @@ Example:    C: . UID EXPUNGE 3000:3002
 					</list>
 				</t>
 				
-                <t>
+        <t>
 				Once a client has issued "ENABLE QRESYNC" (and the server has positively
 				responded to that command with the untagged ENABLED response containing
 				QRESYNC), the server MUST use the VANISHED response without
@@ -1989,15 +2002,16 @@ Example:    C: . UID EXPUNGE 3000:3002
 
 				<t>
         Unlike the VANISHED (EARLIER), this response also decrements the number of messages
-        in the mailbox; it is not necessary for the server to send an
-        EXISTS response with the new value. It also
-        decrements message sequence numbers for each successive message in
-        the mailbox (see the example at the end of this section).
+        in the mailbox, and adjusts the message sequence numbers for the messages remaining in the mailbox to
+        account for the expunged messages.  Because of this housekeeping,
+        it is not necessary for the server to send an EXISTS response
+        the report the new message count.  See the example at the end of
+        this section).
 				</t>
 
 				<t>
-        The VANISHED response without the EARLIER tag MUST only refer to a message
-        which was visible to the client in the current session at the time
+        A VANISHED response without the EARLIER tag MUST refer only to messages
+        that are visible to the client in the current session at the time
         the VANISHED response is sent.
         That is, servers MUST NOT send UIDs for previously expunged
         messages, or messages which were not announced to the client via
@@ -2020,7 +2034,6 @@ But this advice is still a good one. Reword?
 				for the selected mailbox.
 				</t>
 -->
-        
 
 				<t>
 				A VANISHED response MUST NOT be sent when no command is in
@@ -2203,10 +2216,12 @@ S: * VANISHED 5
 				that are bigger than the result of a UID SEARCH command for the same UID set.
 				</t>
 				<t>
-				Clients that use the message sequence match data can reduce the
-				scope of this VANISHED response substantially in the typical
-				case where expunges have not happened, or happen only toward the
-				end of the mailbox.
+        A client can substantially reduce the size of VANISHED responses by
+        providing the server with message sequence match data (see
+<!--Start using "message-seq-match-data" in the future here-->
+        <xref target="qresync-select"/>).  This is especially effective in the typical case where no
+        messages have been expunged, or all expunges were toward the end of the
+        mailbox.
 				</t>
 			</section>
 			
@@ -2851,7 +2866,7 @@ S: A153 OK [HIGHESTMODSEQ 104] done
 
       <t>
       In this revision of the document the authors also acknowledge the feedback provided
-      by Timo Sirainen, Jan Kundrat, Pete Maclean, Eliot Lear, Chris Newman, Claudio Allocchio,
+      by Timo Sirainen, Jan Kundrat, Pete Maclean, Barry Leiba, Eliot Lear, Chris Newman, Claudio Allocchio,
       Michael Slusarz, Bron Gondwana, Hoa V. DINH and Mark Crispin.
       </t>
 
