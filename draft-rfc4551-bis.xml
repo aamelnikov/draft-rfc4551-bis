@@ -94,7 +94,7 @@
 	</t>
 
       <t>
-      Finally, this document also updates the line length recommendation in RFC 2683.
+      Finally, this document also updates the line length recommendation in Section 3.2.1.5 of RFC 2683.
       </t>
 
     </abstract>
@@ -477,8 +477,11 @@ S: A142 OK [READ-WRITE] SELECT completed
    of <xref target="RFC4466"/>):
 
        <list style='hanging'>
-        <t hangText='UNCHANGEDSINCE &lt;mod-sequence>'>
+        <t hangText='UNCHANGEDSINCE &lt;mod-sequence>'/>
+       </list>
+   </t>
 
+        <t>
           For each message specified in the message set, the server performs
           the following.  If the mod-sequence of every metadata item of the
           message affected by the STORE/UID STORE is equal to or less than the specified UNCHANGEDSINCE value,
@@ -489,7 +492,7 @@ S: A142 OK [READ-WRITE] SELECT completed
           is specified, and the response MUST include the MODSEQ message
           data item.  This is required to update the client's cache with the
           correct mod-sequence values.  See <xref target="FETCH-MODSEQ"/> for more details.
-        </t></list></t>
+        </t>
 
       <t>However, if the mod-sequence of any metadata item of the message
       is greater than the specified UNCHANGEDSINCE value, then the
@@ -1253,7 +1256,7 @@ S: * 101 FETCH (MODSEQ (303011130956) FLAGS ($Processed \Deleted
         value than the EXPUNGE's mod-sequence. See example in <xref target="updated-sync-seq"/>.
       </t>
 
-	    <section title='Impact to CONDSTORE-only clients'>
+	    <section title='Impact on CONDSTORE-only clients'>
 		        <t>
             A client that supports CONDSTORE but not QRESYNC might resynchronize
             a mailbox and discover that its HIGHESTMODSEQ has increased from the value
@@ -1403,9 +1406,9 @@ to handle EXPUNGE replies.
 				</list>
 				</t>
 
-				<t>
-				Modification Sequence and UID Parameters:
-				</t>
+        <t>Remaining parameters are described in the following subsections.</t>
+
+        <section title="Modification Sequence and UID Parameters" anchor="select-mod-sequence">
 
 				<t>
 				A server that doesn't support the persistent storage of mod-sequences
@@ -1490,12 +1493,12 @@ to handle EXPUNGE replies.
         In the above example flag information for the UID 42 is not returned, presumably because its flags
         haven't changed since the MODSEQ 90060115194045000.
         </t>
+  
+        </section>
 
-<!--Make a new reference: message-seq-match-data-->
-				<t>
-				Message sequence match data:
-				</t>
-				<t>A client MAY provide a parenthesized list of a message
+        <section title="Message sequence match data" anchor="message-seq-match-data">
+
+        <t>A client MAY provide a parenthesized list of a message
 				sequence set and the corresponding UID sets. Both MUST be provided in ascending order.
 				The server uses this data to restrict
 				the range for which it provides expunged message information.</t>
@@ -1578,6 +1581,9 @@ to handle EXPUNGE replies.
 					</t>
 				</list>
 				</t>
+
+      </section>
+
 			</section>
 
 			<section title="VANISHED UID FETCH Modifier" anchor="FETCH-VANISHED">
@@ -2062,13 +2068,13 @@ But this advice is still a good one. Reword?
 					<preamble>
 						Example: Let's assume that there is the following mapping between
 						message numbers and UIDs in the currently selected mailbox (here
-						"X" marks messages with the \Deleted flag set, and "x" represents
+						"D" marks messages with the \Deleted flag set, and "x" represents
 						UIDs which are not relevant for the example):
 					</preamble>
 					<artwork>
 Message numbers:   1    2    3    4    5  6   7  8  9 10  11
 UIDs:              x  504  505  507  508  x 510  x  x  x 625
-\Deleted messages:           X    X           X            X
+\Deleted messages:           D    D           D            D
 					</artwork>
 					<postamble>
 					</postamble>
@@ -2217,9 +2223,8 @@ S: * VANISHED 5
 				</t>
 				<t>
         A client can substantially reduce the size of VANISHED responses by
-        providing the server with message sequence match data (see
-<!--Start using "message-seq-match-data" in the future here-->
-        <xref target="qresync-select"/>).  This is especially effective in the typical case where no
+        providing the server with message sequence match data (see <xref target="message-seq-match-data"/>).
+        This is especially effective in the typical case where no
         messages have been expunged, or all expunges were toward the end of the
         mailbox.
 				</t>
@@ -2227,11 +2232,12 @@ S: * VANISHED 5
 			
 			<section title="Server Implementations Storing Minimal State">
 			        <t>
-				A server that stores the HIGHESTMODSEQ value at the time of the last EXPUNGE
-				can omit the VANISHED response when a client provides a MODSEQ value that is equal
-				to, or higher than, the current value of this datum, that is, when there have been no
-				EXPUNGEs.
+        A server that stores the HIGHESTMODSEQ value at the time of the last EXPUNGE
+        can omit the VANISHED response when a client provides a MODSEQ value that is equal
+        to, or higher than that HIGHESTMODSEQ value, because there have been no messages
+        expunged during the time period the client is concerned about.
 				</t>
+
 				<t>A client providing message sequence match data can reduce the scope as above. In
 				the case where there have been no expunges, the server can ignore this data.</t>
 			</section>
