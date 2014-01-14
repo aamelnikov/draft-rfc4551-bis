@@ -2872,8 +2872,14 @@ S: A153 OK [HIGHESTMODSEQ 104] done
 
       <t>
       In this revision of the document the authors also acknowledge the feedback provided
-      by Timo Sirainen, Jan Kundrat, Pete Maclean, Barry Leiba, Eliot Lear, Chris Newman, Claudio Allocchio,
-      Michael Slusarz, Bron Gondwana, Hoa V. DINH and Mark Crispin.
+      by Timo Sirainen, Jan Kundrat, Pete Maclean, Barry Leiba, Eliot Lear, Chris Newman,
+      Claudio Allocchio, Michael Slusarz, Bron Gondwana, Arnt Gulbrandsen and Hoa V. DINH.
+      </t>
+
+      <t>
+      Mark Crispin contributed to RFC 4551 and RFC 5162 that this document is
+      replacing, and that much of his contribution remains in this merged
+      document.
       </t>
 
       <t>See also RFC 4551 for the list of people who contributed to earlier version of this RFC.</t>
