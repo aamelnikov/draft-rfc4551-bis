@@ -15,7 +15,7 @@
         <!ENTITY rfc5464 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5464.xml'>
         <!ENTITY rfc6851 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6851.xml'>
 ]>
-<rfc category="std" ipr="pre5378Trust200902" docName="draft-ietf-qresync-rfc5162bis-09.txt"
+<rfc category="std" ipr="pre5378Trust200902" docName="draft-ietf-qresync-rfc5162bis-10.txt"
 	 obsoletes="4551, 5162" updates='2683'>
 	<?xml-stylesheet href="rfc5162_files/rfc2629.htm" type="text/xsl"?>
         <?rfc strict="yes" ?>
@@ -1248,9 +1248,9 @@ S: * 101 FETCH (MODSEQ (303011130956) FLAGS ($Processed \Deleted
       </t>
 
       <t>
-        Server implementing QRESYNC MUST send untagged events to client in a
-        way that client doesn't lose any changes in case of connectivity loss.
-        In particular this means that if server sends MODSEQ FETCH data items
+        A server implementing QRESYNC MUST send untagged events to a client in a
+        way that the client doesn't lose any changes in case of connectivity loss.
+        In particular this means that if the server sends MODSEQ FETCH data items
         while EXPUNGE (or VANISHED) replies with lower mod-sequences are being
         delayed, the server MUST send HIGHESTMODSEQ response code with a lower
         value than the EXPUNGE's mod-sequence. See example in <xref target="updated-sync-seq"/>.
