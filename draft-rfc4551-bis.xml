@@ -786,7 +786,7 @@ S: b003 OK Conditional Store completed
 
    <list style='hanging'><t hangText='CHANGEDSINCE &lt;mod-sequence>'>
 
-      CHANGEDSINCE FETCH modifier allows to further subset
+      CHANGEDSINCE FETCH modifier allows the client to further subset
       the list of messages described by sequence set.  The information
       described by message data items is only returned for messages that
       have mod-sequence bigger than &lt;mod-sequence>.</t>
@@ -2324,8 +2324,9 @@ S: * VANISHED 5
 
 			<t>
 			An advanced disconnected mail client SHOULD use the QRESYNC
-			and CONDSTORE extensions when they are supported by the server. The
-			client uses the value from the HIGHESTMODSEQ OK response code received
+			extension when it is supported by the server, and SHOULD use CONDSTORE
+			if it is supported and QRESYNC is not.
+			The client uses the value from the HIGHESTMODSEQ OK response code received
 			on mailbox opening to determine if it needs to resynchronize. Once
 			the synchronization is complete, it MUST cache the received value
 			(unless the mailbox UIDVALIDITY value has changed; see below).
